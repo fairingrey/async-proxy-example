@@ -3,7 +3,7 @@
 use futures::{StreamExt, future::try_join, FutureExt};
 use std::{net::SocketAddr, io};
 use tokio::runtime::current_thread;
-use tokio_tcp::{TcpListener, TcpStream};
+use tokio::net::{TcpListener, TcpStream};
 
 mod split;
 mod copy;
@@ -13,12 +13,17 @@ use copy::copy;
 
 fn main() -> io::Result<()> {
     let incoming_addr = "127.0.0.1:3556".parse().unwrap();
-    let proxy_addr = "172.217.11.46:80".parse().unwrap();
+    let proxy_addr = "127.0.0.1:3557".parse().unwrap();
 
     println!("Listening on: {}", incoming_addr);
     println!("Proxying to: {}", proxy_addr);
 
-    current_thread::block_on_all(proxy(incoming_addr, proxy_addr))
+    let proxy_future = proxy(incoming_addr, proxy_addr);
+
+    // should not fail
+    let mut current_thread_rt = current_thread::Runtime::new().unwrap();
+
+    current_thread_rt.block_on(proxy_future)
 }
 
 async fn proxy(addr: SocketAddr, proxy_addr: SocketAddr) -> io::Result<()> {

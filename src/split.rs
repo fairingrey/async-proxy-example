@@ -1,8 +1,8 @@
 use std::io;
 use std::pin::Pin;
 use std::task::{Context, Poll};
-use tokio_io::{AsyncRead, AsyncWrite};
-use tokio_sync::lock::Lock;
+use tokio::io::{AsyncRead, AsyncWrite};
+use tokio::sync::lock::Lock;
 
 macro_rules! ready {
     ($e:expr) => {
